@@ -16,6 +16,7 @@ import {
 const usersRouter = Router();
 
 usersRouter.get('/users', findAllUsers);
+usersRouter.get('/users/me', getUserInfo);
 usersRouter.get(
   '/users/:userId',
   validateRequest(userIdParamSchema, 'params'),
@@ -31,6 +32,5 @@ usersRouter.patch(
   validateRequest(updateInfoUserSchema, 'body'),
   updateInfoUser,
 );
-usersRouter.get('/users/me', getUserInfo);
 
 export default usersRouter;

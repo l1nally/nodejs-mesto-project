@@ -3,8 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import ConflictError from '../errors/conflict-err';
 import User from '../models/user';
-import { ERROR_CODES } from '../utils/constants';
+import { ERROR_CODES, JWT_SECRET } from '../utils/constants';
 import NotFoundError from '../errors/not-found-err';
+import BadRequestError from '../errors/bad-request-err';
 
 declare global {
   namespace Express {
@@ -43,9 +44,9 @@ export const findUserById = (
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        return res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: 'Передан некорректный _id пользователя.' });
+        return next(
+          new BadRequestError('Передан некорректный _id пользователя.'),
+        );
       }
 
       return next(error);
@@ -72,7 +73,6 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       avatar,
       email,
     }))
-
     .catch((error) => {
       if (error.code === 11000) {
         return next(
@@ -80,11 +80,11 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         );
       }
       if (error.name === 'ValidationError') {
-        return res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({
-            message: 'Переданы некорректные данные при создании пользователя.',
-          });
+        return next(
+          new BadRequestError(
+            'Переданы некорректные данные при создании пользователя.',
+          ),
+        );
       }
 
       return next(error);
@@ -116,11 +116,11 @@ export const updateInfoUser = (
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({
-            message: 'Переданы некорректные данные при обновлении профиля.',
-          });
+        return next(
+          new BadRequestError(
+            'Переданы некорректные данные при обновлении профиля.',
+          ),
+        );
       }
 
       return next(error);
@@ -152,11 +152,11 @@ export const updateAvatarUser = (
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({
-            message: 'Переданы некорректные данные при обновлении аватара.',
-          });
+        return next(
+          new BadRequestError(
+            'Переданы некорректные данные при обновлении аватара.',
+          ),
+        );
       }
 
       return next(error);
@@ -165,11 +165,10 @@ export const updateAvatarUser = (
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  const { JWT_SECRET } = process.env;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET!, {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
 
@@ -200,9 +199,9 @@ export const getUserInfo = (
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        return res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: 'Передан некорректный _id пользователя.' });
+        return next(
+          new BadRequestError('Передан некорректный _id пользователя.'),
+        );
       }
 
       return next(error);

@@ -13,10 +13,9 @@ import notFound from './middlewares/notFound';
 import errorHandler from './middlewares/errorHandler';
 import validateRequest from './middlewares/validateRequest';
 import { createUserSchema, loginSchema } from './schemas/userSchema';
+import { PORT } from './utils/constants';
 
 dotenv.config();
-
-const { PORT = 3000 } = process.env;
 
 const app = express();
 
@@ -49,6 +48,6 @@ app.use('*', notFound);
 app.use(errorLogger);
 app.use(errorHandler);
 
-app.listen(+PORT, () => {
+app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });

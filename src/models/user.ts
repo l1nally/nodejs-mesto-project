@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import { IUser, IUserModel } from '../utils/types';
+import UnauthorizedError from '../errors/unauthorized-err';
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -44,12 +45,16 @@ userSchema.static(
       .select('+password')
       .then((user: IUser | null) => {
         if (!user) {
-          return Promise.reject(new Error('Неправильные почта или пароль'));
+          return Promise.reject(
+            new UnauthorizedError('Неправильные почта или пароль'),
+          );
         }
 
         return bcrypt.compare(password, user.password).then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(
+              new UnauthorizedError('Неправильные почта или пароль'),
+            );
           }
           return user;
         });

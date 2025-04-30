@@ -1,7 +1,5 @@
 import { z } from 'zod';
-
-const urlRegex = /^https?:\/\/(www\.)?([\w-]+\.)+[a-zA-Z]{2,}([\w\-.~:/?#[\]@!$&'()*+,;=]*)?#?$/;
-const idRegex = /^[0-9a-fA-F]{24}$/;
+import { urlRegex, idRegex } from '../utils/constants';
 
 export const createUserSchema = z.object({
   name: z.string().min(2).max(30).optional(),
